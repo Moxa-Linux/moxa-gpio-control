@@ -16,7 +16,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <sys/file.h>
 
 #include "mx_gpio.h"
 
@@ -64,7 +63,6 @@ static int read_file(char *filepath, char *data)
 		sprintf(mx_errmsg, "open %s: %s", filepath, strerror(errno));
 		return -1; /* E_SYSFUNCERR */
 	}
-	flock(fd, LOCK_EX);
 
 	if (read(fd, data, sizeof(data)) <= 0) {
 		sprintf(mx_errmsg, "read %s: %s", filepath, strerror(errno));
@@ -85,7 +83,6 @@ static int write_file(char *filepath, const char *data)
 		sprintf(mx_errmsg, "open %s: %s", filepath, strerror(errno));
 		return -1; /* E_SYSFUNCERR */
 	}
-	flock(fd, LOCK_EX);
 
 	if (write(fd, data, strlen(data)) < 0) {
 		sprintf(mx_errmsg, "write %s: %s", filepath, strerror(errno));
