@@ -17,7 +17,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/file.h>
-#include <moxa/mx_errno.h>
 
 #include "mx_gpio.h"
 
@@ -63,18 +62,18 @@ static int read_file(char *filepath, char *data)
 	fd = open(filepath, O_RDONLY);
 	if (fd < 0) {
 		sprintf(mx_errmsg, "open %s: %s", filepath, strerror(errno));
-		return E_SYSFUNCERR;
+		return -1; /* E_SYSFUNCERR */
 	}
 	flock(fd, LOCK_EX);
 
 	if (read(fd, data, sizeof(data)) <= 0) {
 		sprintf(mx_errmsg, "read %s: %s", filepath, strerror(errno));
 		close(fd);
-		return E_SYSFUNCERR;
+		return -1; /* E_SYSFUNCERR */
 	}
 	close(fd);
 
-	return E_SUCCESS;
+	return -1; /* E_SYSFUNCERR */
 }
 
 static int write_file(char *filepath, const char *data)
@@ -84,18 +83,18 @@ static int write_file(char *filepath, const char *data)
 	fd = open(filepath, O_WRONLY);
 	if (fd < 0) {
 		sprintf(mx_errmsg, "open %s: %s", filepath, strerror(errno));
-		return E_SYSFUNCERR;
+		return -1; /* E_SYSFUNCERR */
 	}
 	flock(fd, LOCK_EX);
 
 	if (write(fd, data, strlen(data)) < 0) {
 		sprintf(mx_errmsg, "write %s: %s", filepath, strerror(errno));
 		close(fd);
-		return E_SYSFUNCERR;
+		return -1; /* E_SYSFUNCERR */
 	}
 	close(fd);
 
-	return E_SUCCESS;
+	return 0;
 }
 
 static inline int is_direction(char *buffer, int dir)
@@ -124,7 +123,7 @@ int mx_gpio_export(int gpio_num)
 
 	/* if device node is existed, do nothing */
 	if (is_gpio_exported(gpio_num))
-		return E_SUCCESS;
+		return 0;
 
 	sprintf(filepath, "%s/%s", GPIO_BASEPATH, GPIO_EXPORT_FILE);
 	sprintf(buffer, "%d", gpio_num);
@@ -139,7 +138,7 @@ int mx_gpio_unexport(int gpio_num)
 
 	/* if device node is not existed, do nothing */
 	if (!is_gpio_exported(gpio_num))
-		return E_SUCCESS;
+		return 0;
 
 	sprintf(filepath, "%s/%s", GPIO_BASEPATH, GPIO_UNEXPORT_FILE);
 	sprintf(buffer, "%d", gpio_num);
@@ -153,12 +152,12 @@ int mx_gpio_set_direction(int gpio_num, int direction)
 
 	if (!is_gpio_exported(gpio_num)) {
 		sprintf(mx_errmsg, "GPIO %d is not exported", gpio_num);
-		return E_GPIO_NOTEXP;
+		return -20; /* E_GPIO_NOTEXP */
 	}
 
 	if (direction < 0 || direction > 1) {
 		sprintf(mx_errmsg, "Invalid direction: %d", direction);
-		return E_INVAL;
+		return -2; /* E_INVAL */
 	}
 
 	sprintf(filepath, "%s/gpio%d/%s", GPIO_BASEPATH, gpio_num, GPIO_DIRECTION_FILE);
@@ -173,7 +172,7 @@ int mx_gpio_get_direction(int gpio_num, int *direction)
 	int ret;
 
 	if (!is_gpio_exported(gpio_num))
-		return E_GPIO_NOTEXP;
+		return -20; /* E_GPIO_NOTEXP */
 
 	sprintf(filepath, "%s/gpio%d/%s", GPIO_BASEPATH, gpio_num, GPIO_DIRECTION_FILE);
 
@@ -183,14 +182,14 @@ int mx_gpio_get_direction(int gpio_num, int *direction)
 
 	if (is_direction(buffer, GPIO_DIRECTION_IN)) {
 		*direction = GPIO_DIRECTION_IN;
-		return E_SUCCESS;
+		return 0;
 	} else if (is_direction(buffer, GPIO_DIRECTION_OUT)) {
 		*direction = GPIO_DIRECTION_OUT;
-		return E_SUCCESS;
+		return 0;
 	}
 
 	sprintf(mx_errmsg, "Unknown direction: %s", buffer);
-	return E_GPIO_UNKDIR;
+	return -21; /* E_GPIO_UNKDIR */
 }
 
 int mx_gpio_set_value(int gpio_num, int value)
@@ -199,12 +198,12 @@ int mx_gpio_set_value(int gpio_num, int value)
 
 	if (!is_gpio_exported(gpio_num)) {
 		sprintf(mx_errmsg, "GPIO %d is not exported", gpio_num);
-		return E_GPIO_NOTEXP;
+		return -20; /* E_GPIO_NOTEXP */
 	}
 
 	if (value < 0 || value > 1) {
 		sprintf(mx_errmsg, "Invalid value: %d", value);
-		return E_INVAL;
+		return -2; /* E_INVAL */
 	}
 
 	sprintf(filepath, "%s/gpio%d/%s", GPIO_BASEPATH, gpio_num, GPIO_VALUE_FILE);
@@ -219,7 +218,7 @@ int mx_gpio_get_value(int gpio_num, int *value)
 	int ret;
 
 	if (!is_gpio_exported(gpio_num))
-		return E_GPIO_NOTEXP;
+		return -20; /* E_GPIO_NOTEXP */
 
 	sprintf(filepath, "%s/gpio%d/%s", GPIO_BASEPATH, gpio_num, GPIO_VALUE_FILE);
 
@@ -229,12 +228,12 @@ int mx_gpio_get_value(int gpio_num, int *value)
 
 	if (is_value(buffer, GPIO_VALUE_LOW)) {
 		*value = GPIO_VALUE_LOW;
-		return E_SUCCESS;
+		return 0;
 	} else if (is_value(buffer, GPIO_VALUE_HIGH)) {
 		*value = GPIO_VALUE_HIGH;
-		return E_SUCCESS;
+		return 0;
 	}
 
 	sprintf(mx_errmsg, "Unknown GPIO value: %s", buffer);
-	return E_GPIO_UNKVAL;
+	return -22; /* E_GPIO_UNKVAL */
 }
