@@ -18,11 +18,7 @@
 #include <errno.h>
 #include <mx_gpio.h>
 
-#define GPIO_BASEPATH "/sys/class/gpio"
-#define GPIO_EXPORT_FILE "export"
-#define GPIO_UNEXPORT_FILE "unexport"
-#define GPIO_DIRECTION_FILE "direction"
-#define GPIO_VALUE_FILE "value"
+#define SYSFS_GPIO_PATH "/sys/class/gpio"
 #define MAX_FILEPATH_LEN 256	/* reserved length for file path */
 #define MAX_BUFFER_LEN 32	/* reserved length for buffer */
 
@@ -46,7 +42,7 @@ static int is_gpio_exported(int gpio_num)
 	char filepath[MAX_FILEPATH_LEN];
 
 	/* check if value file existed */
-	sprintf(filepath, "%s/gpio%d/%s", GPIO_BASEPATH, gpio_num, GPIO_VALUE_FILE);
+	sprintf(filepath, "%s/gpio%d/value", SYSFS_GPIO_PATH, gpio_num);
 	if (access(filepath, F_OK) < 0)
 		return 0;
 
@@ -70,7 +66,7 @@ static int read_file(char *filepath, char *data)
 	}
 	close(fd);
 
-	return -1; /* E_SYSFUNCERR */
+	return 0;
 }
 
 static int write_file(char *filepath, const char *data)
@@ -121,7 +117,7 @@ int mx_gpio_export(int gpio_num)
 	if (is_gpio_exported(gpio_num))
 		return 0;
 
-	sprintf(filepath, "%s/%s", GPIO_BASEPATH, GPIO_EXPORT_FILE);
+	sprintf(filepath, "%s/export", SYSFS_GPIO_PATH);
 	sprintf(buffer, "%d", gpio_num);
 
 	return write_file(filepath, buffer);
@@ -136,7 +132,7 @@ int mx_gpio_unexport(int gpio_num)
 	if (!is_gpio_exported(gpio_num))
 		return 0;
 
-	sprintf(filepath, "%s/%s", GPIO_BASEPATH, GPIO_UNEXPORT_FILE);
+	sprintf(filepath, "%s/unexport", SYSFS_GPIO_PATH);
 	sprintf(buffer, "%d", gpio_num);
 
 	return write_file(filepath, buffer);
@@ -156,7 +152,7 @@ int mx_gpio_set_direction(int gpio_num, int direction)
 		return -2; /* E_INVAL */
 	}
 
-	sprintf(filepath, "%s/gpio%d/%s", GPIO_BASEPATH, gpio_num, GPIO_DIRECTION_FILE);
+	sprintf(filepath, "%s/gpio%d/direction", SYSFS_GPIO_PATH, gpio_num);
 
 	return write_file(filepath, gpio_directions[direction]);
 }
@@ -170,7 +166,7 @@ int mx_gpio_get_direction(int gpio_num, int *direction)
 	if (!is_gpio_exported(gpio_num))
 		return -20; /* E_GPIO_NOTEXP */
 
-	sprintf(filepath, "%s/gpio%d/%s", GPIO_BASEPATH, gpio_num, GPIO_DIRECTION_FILE);
+	sprintf(filepath, "%s/gpio%d/direction", SYSFS_GPIO_PATH, gpio_num);
 
 	ret = read_file(filepath, buffer);
 	if (ret < 0)
@@ -202,7 +198,7 @@ int mx_gpio_set_value(int gpio_num, int value)
 		return -2; /* E_INVAL */
 	}
 
-	sprintf(filepath, "%s/gpio%d/%s", GPIO_BASEPATH, gpio_num, GPIO_VALUE_FILE);
+	sprintf(filepath, "%s/gpio%d/value", SYSFS_GPIO_PATH, gpio_num);
 
 	return write_file(filepath, gpio_values[value]);
 }
@@ -216,7 +212,7 @@ int mx_gpio_get_value(int gpio_num, int *value)
 	if (!is_gpio_exported(gpio_num))
 		return -20; /* E_GPIO_NOTEXP */
 
-	sprintf(filepath, "%s/gpio%d/%s", GPIO_BASEPATH, gpio_num, GPIO_VALUE_FILE);
+	sprintf(filepath, "%s/gpio%d/value", SYSFS_GPIO_PATH, gpio_num);
 
 	ret = read_file(filepath, buffer);
 	if (ret < 0)
