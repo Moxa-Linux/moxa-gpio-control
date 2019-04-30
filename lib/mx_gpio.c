@@ -16,8 +16,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
-
-#include "mx_gpio.h"
+#include <mx_gpio.h>
 
 #define GPIO_BASEPATH "/sys/class/gpio"
 #define GPIO_EXPORT_FILE "export"
