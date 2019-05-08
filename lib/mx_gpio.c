@@ -15,14 +15,11 @@
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
-#include <errno.h>
 #include <mx_gpio.h>
 
 #define SYSFS_GPIO_PATH "/sys/class/gpio"
 #define MAX_FILEPATH_LEN 256	/* reserved length for file path */
 #define MAX_BUFFER_LEN 32	/* reserved length for buffer */
-
-extern char mx_errmsg[256];
 
 /*
  * static functions
@@ -44,18 +41,14 @@ static int read_file(char *filepath, char *data)
 	int fd;
 
 	fd = open(filepath, O_RDONLY);
-	if (fd < 0) {
-		sprintf(mx_errmsg, "open %s: %s", filepath, strerror(errno));
+	if (fd < 0) 
 		return -1; /* E_SYSFUNCERR */
-	}
 
 	if (read(fd, data, sizeof(data)) <= 0) {
-		sprintf(mx_errmsg, "read %s: %s", filepath, strerror(errno));
 		close(fd);
 		return -1; /* E_SYSFUNCERR */
 	}
 	close(fd);
-
 	return 0;
 }
 
@@ -64,18 +57,14 @@ static int write_file(char *filepath, const char *data)
 	int fd;
 
 	fd = open(filepath, O_WRONLY);
-	if (fd < 0) {
-		sprintf(mx_errmsg, "open %s: %s", filepath, strerror(errno));
+	if (fd < 0)
 		return -1; /* E_SYSFUNCERR */
-	}
 
 	if (write(fd, data, strlen(data)) < 0) {
-		sprintf(mx_errmsg, "write %s: %s", filepath, strerror(errno));
 		close(fd);
 		return -1; /* E_SYSFUNCERR */
 	}
 	close(fd);
-
 	return 0;
 }
 
@@ -121,10 +110,8 @@ int mx_gpio_set_direction(int gpio_num, int direction)
 {
 	char filepath[MAX_FILEPATH_LEN];
 
-	if (!is_gpio_exported(gpio_num)) {
-		sprintf(mx_errmsg, "GPIO %d is not exported", gpio_num);
+	if (!is_gpio_exported(gpio_num))
 		return -20; /* E_GPIO_NOTEXP */
-	}
 
 	sprintf(filepath, "%s/gpio%d/direction", SYSFS_GPIO_PATH, gpio_num);
 	if (direction == GPIO_DIRECTION_IN) {
@@ -158,8 +145,6 @@ int mx_gpio_get_direction(int gpio_num, int *direction)
 		*direction = GPIO_DIRECTION_OUT;
 		return 0;
 	}
-
-	sprintf(mx_errmsg, "Unknown direction: %s", buffer);
 	return -21; /* E_GPIO_UNKDIR */
 }
 
@@ -167,10 +152,8 @@ int mx_gpio_set_value(int gpio_num, int value)
 {
 	char filepath[MAX_FILEPATH_LEN];
 
-	if (!is_gpio_exported(gpio_num)) {
-		sprintf(mx_errmsg, "GPIO %d is not exported", gpio_num);
+	if (!is_gpio_exported(gpio_num))
 		return -20; /* E_GPIO_NOTEXP */
-	}
 
 	sprintf(filepath, "%s/gpio%d/value", SYSFS_GPIO_PATH, gpio_num);
 	if (value == GPIO_VALUE_LOW) {
@@ -204,7 +187,5 @@ int mx_gpio_get_value(int gpio_num, int *value)
 		*value = GPIO_VALUE_HIGH;
 		return 0;
 	}
-
-	sprintf(mx_errmsg, "Unknown GPIO value: %s", buffer);
 	return -22; /* E_GPIO_UNKVAL */
 }
