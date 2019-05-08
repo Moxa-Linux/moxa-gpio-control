@@ -24,19 +24,9 @@
 
 extern char mx_errmsg[256];
 
-static const char *gpio_directions[2] = {
-	"in",
-	"out"
-};
-static const char *gpio_values[2] = {
-	"0",
-	"1"
-};
-
 /*
  * static functions
  */
-
 static int is_gpio_exported(int gpio_num)
 {
 	char filepath[MAX_FILEPATH_LEN];
@@ -89,20 +79,9 @@ static int write_file(char *filepath, const char *data)
 	return 0;
 }
 
-static inline int is_direction(char *buffer, int dir)
-{
-	return !strncmp(buffer, gpio_directions[dir], strlen(gpio_directions[dir]));
-}
-
-static inline int is_value(char *buffer, int value)
-{
-	return !strncmp(buffer, gpio_values[value], strlen(gpio_values[value]));
-}
-
 /*
  * APIs
  */
-
 int mx_gpio_is_exported(int gpio_num)
 {
 	return is_gpio_exported(gpio_num);
@@ -147,14 +126,14 @@ int mx_gpio_set_direction(int gpio_num, int direction)
 		return -20; /* E_GPIO_NOTEXP */
 	}
 
-	if (direction < 0 || direction > 1) {
-		sprintf(mx_errmsg, "Invalid direction: %d", direction);
+	sprintf(filepath, "%s/gpio%d/direction", SYSFS_GPIO_PATH, gpio_num);
+	if (direction == GPIO_DIRECTION_IN) {
+		return write_file(filepath, "in");
+	} else if (direction == GPIO_DIRECTION_OUT) {
+		return write_file(filepath, "out");
+	} else {
 		return -2; /* E_INVAL */
 	}
-
-	sprintf(filepath, "%s/gpio%d/direction", SYSFS_GPIO_PATH, gpio_num);
-
-	return write_file(filepath, gpio_directions[direction]);
 }
 
 int mx_gpio_get_direction(int gpio_num, int *direction)
@@ -172,10 +151,10 @@ int mx_gpio_get_direction(int gpio_num, int *direction)
 	if (ret < 0)
 		return ret;
 
-	if (is_direction(buffer, GPIO_DIRECTION_IN)) {
+	if (!strncmp(buffer, "in", 2)) {
 		*direction = GPIO_DIRECTION_IN;
 		return 0;
-	} else if (is_direction(buffer, GPIO_DIRECTION_OUT)) {
+	} else if (!strncmp(buffer, "out", 3)) {
 		*direction = GPIO_DIRECTION_OUT;
 		return 0;
 	}
@@ -193,14 +172,14 @@ int mx_gpio_set_value(int gpio_num, int value)
 		return -20; /* E_GPIO_NOTEXP */
 	}
 
-	if (value < 0 || value > 1) {
-		sprintf(mx_errmsg, "Invalid value: %d", value);
+	sprintf(filepath, "%s/gpio%d/value", SYSFS_GPIO_PATH, gpio_num);
+	if (value == GPIO_VALUE_LOW) {
+		return write_file(filepath, "0");
+	} else if (value == GPIO_VALUE_HIGH) {
+		return write_file(filepath, "1");
+	} else {
 		return -2; /* E_INVAL */
 	}
-
-	sprintf(filepath, "%s/gpio%d/value", SYSFS_GPIO_PATH, gpio_num);
-
-	return write_file(filepath, gpio_values[value]);
 }
 
 int mx_gpio_get_value(int gpio_num, int *value)
@@ -218,10 +197,10 @@ int mx_gpio_get_value(int gpio_num, int *value)
 	if (ret < 0)
 		return ret;
 
-	if (is_value(buffer, GPIO_VALUE_LOW)) {
+	if (!strncmp(buffer, "0", 1)) {
 		*value = GPIO_VALUE_LOW;
 		return 0;
-	} else if (is_value(buffer, GPIO_VALUE_HIGH)) {
+	} else if (!strncmp(buffer, "1", 1)) {
 		*value = GPIO_VALUE_HIGH;
 		return 0;
 	}
