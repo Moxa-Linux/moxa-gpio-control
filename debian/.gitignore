@@ -1,0 +1,15 @@
+# common
+*.debhelper.log
+*.substvars
+*.postinst.debhelper
+*.postrm.debhelper
+files
+debhelper-build-stamp
+autoreconf.before
+autoreconf.after
+.debhelper/
+tmp/
+
+# package tmp dir
+libmoxa-gpio-control1/
+libmoxa-gpio-control-dev/
