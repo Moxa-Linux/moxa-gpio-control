@@ -1,3 +1,11 @@
+moxa-gpio-control (1.0.2+deb9) stretch; urgency=low
+
+  * Remove mx_errmsg.
+  * Change install directory for libmx_gpio_ctl.so*
+    from `/lib/<arch>` to `/usr/lib/<arch>`.
+
+ -- Ken CJ Chou <KenCJ.Chou@moxa.com>  Thu, 27 Jun 2019 16:38:00 +0800
+
 moxa-gpio-control (1.0.0+deb9) stretch; urgency=low
 
   * Initial release.
