@@ -1,9 +1,7 @@
 Source: moxa-gpio-control
 Priority: required
 Maintainer: Ken CJ Chou <KenCJ.Chou@moxa.com>
-Build-Depends: debhelper (>= 10), 
-               dh-exec,
-               libmoxa-errno-dev (>= 1.0.0)
+Build-Depends: debhelper (>= 10)
 Standards-Version: 4.1.2
 Section: libs
 Homepage: https://www.moxa.com/

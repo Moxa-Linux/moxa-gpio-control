@@ -1,3 +1,2 @@
-#!/usr/bin/dh-exec
-mx_gpio.h /usr/include/moxa/
-mx_gpio.a /usr/lib/${DEB_HOST_MULTIARCH}/
+usr/include/moxa/mx_gpio.h
+usr/lib/*/libmx_gpio_ctl.so
