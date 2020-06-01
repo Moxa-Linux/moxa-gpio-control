@@ -155,11 +155,11 @@ int mx_gpio_set_value(int gpio_num, int value)
 	if (!is_gpio_exported(gpio_num))
 		return -20; /* E_GPIO_NOTEXP */
 
-	sprintf(filepath, "%s/gpio%d/value", SYSFS_GPIO_PATH, gpio_num);
+	sprintf(filepath, "%s/gpio%d/direction", SYSFS_GPIO_PATH, gpio_num);
 	if (value == GPIO_VALUE_LOW) {
-		return write_file(filepath, "0");
+		return write_file(filepath, "low");
 	} else if (value == GPIO_VALUE_HIGH) {
-		return write_file(filepath, "1");
+		return write_file(filepath, "high");
 	} else {
 		return -2; /* E_INVAL */
 	}
