@@ -110,6 +110,9 @@ int mx_gpio_set_direction(int gpio_num, int direction)
 {
 	char filepath[MAX_FILEPATH_LEN];
 
+	if (mx_gpio_export(gpio_num))
+		return -1; /* E_SYSFUNCERR */
+
 	if (!is_gpio_exported(gpio_num))
 		return -20; /* E_GPIO_NOTEXP */
 
@@ -128,6 +131,9 @@ int mx_gpio_get_direction(int gpio_num, int *direction)
 	char filepath[MAX_FILEPATH_LEN];
 	char buffer[MAX_BUFFER_LEN];
 	int ret;
+
+	if (mx_gpio_export(gpio_num))
+		return -1; /* E_SYSFUNCERR */
 
 	if (!is_gpio_exported(gpio_num))
 		return -20; /* E_GPIO_NOTEXP */
@@ -152,6 +158,9 @@ int mx_gpio_set_value(int gpio_num, int value)
 {
 	char filepath[MAX_FILEPATH_LEN];
 
+	if (mx_gpio_export(gpio_num))
+		return -1; /* E_SYSFUNCERR */
+
 	if (!is_gpio_exported(gpio_num))
 		return -20; /* E_GPIO_NOTEXP */
 
@@ -170,6 +179,9 @@ int mx_gpio_get_value(int gpio_num, int *value)
 	char filepath[MAX_FILEPATH_LEN];
 	char buffer[MAX_BUFFER_LEN];
 	int ret;
+
+	if (mx_gpio_export(gpio_num))
+		return -1; /* E_SYSFUNCERR */
 
 	if (!is_gpio_exported(gpio_num))
 		return -20; /* E_GPIO_NOTEXP */
