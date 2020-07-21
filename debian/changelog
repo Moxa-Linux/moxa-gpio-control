@@ -1,0 +1,6 @@
+moxa-gpio-control (1.0.3+deb10) buster; urgency=medium
+
+  * Initial release
+  * Source code was based on version 1.0.3
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Tue, 21 Jul 2020 19:37:22 +0800

@@ -1,0 +1,2 @@
+usr/include/moxa/mx_gpio.h
+usr/lib/*/libmx_gpio_ctl.so
