@@ -1,0 +1,8 @@
+libmx_gpio_ctl.so.1 libmoxa-gpio-control1 #MINVER#
+ mx_gpio_is_exported@Base 1.0.0
+ mx_gpio_export@Base 1.0.0
+ mx_gpio_unexport@Base 1.0.0
+ mx_gpio_set_direction@Base 1.0.0
+ mx_gpio_get_direction@Base 1.0.0
+ mx_gpio_set_value@Base 1.0.0
+ mx_gpio_get_value@Base 1.0.0
